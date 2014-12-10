@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@android:id/background"
+        android:drawable="@drawable/seekbar_bg" />
+    <item android:id="@android:id/progress" >
+        <clip>
+    	<bitmap android:src="@drawable/seekbar_stripe_bg"
+            android:antialias="false"
+            android:filter="false"
+            android:dither="false"
+            android:gravity="center_vertical|left" />
+        </clip>
+    </item>
+</layer-list>

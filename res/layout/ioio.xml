@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layoutPreview"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent" >
+    <SurfaceView
+	    android:id="@+id/preview"
+	    android:layout_width="match_parent"
+	    android:layout_height="match_parent" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/txtIP"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0.0.0.0"
+            android:textColor="#ca2559"
+            android:textSize="@dimen/data_text_size" />
+
+	    <TextView
+	        android:id="@+id/txtSpeed"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="Speed 0"
+	        android:textColor="#ca2559"
+	        android:textSize="@dimen/data_text_size" />
+ 
+        <ImageView
+            android:id="@+id/imagePreview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+	</LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+	    android:layout_margin="10dp"
+        android:orientation="vertical" >
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+            <Button
+                android:id="@+id/buttonUpLeft"
+                android:layout_width="@dimen/direction_longest"
+                android:layout_height="@dimen/direction_longest"
+                android:background="@drawable/checkbox_upleft"
+                android:enabled="false" />
+
+            <Button
+                android:id="@+id/buttonUp"
+                android:layout_width="@dimen/direction_shortest"
+                android:layout_height="@dimen/direction_longest"
+                android:background="@drawable/checkbox_up"
+                android:enabled="false" />
+
+            <Button
+                android:id="@+id/buttonUpRight"
+                android:layout_width="@dimen/direction_longest"
+                android:layout_height="@dimen/direction_longest"
+                android:background="@drawable/checkbox_upright"
+                android:enabled="false" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+            <Button
+                android:id="@+id/buttonLeft"
+                android:layout_width="@dimen/direction_longest"
+                android:layout_height="@dimen/direction_shortest"
+                android:background="@drawable/checkbox_left"
+                android:enabled="false" />
+
+            <Button
+                android:layout_width="@dimen/direction_shortest"
+                android:layout_height="@dimen/direction_shortest"
+                android:background="@drawable/checkbox_center"
+                android:enabled="false"
+                android:visibility="invisible" />
+
+            <Button
+                android:id="@+id/buttonRight"
+                android:layout_width="@dimen/direction_longest"
+                android:layout_height="@dimen/direction_shortest"
+                android:background="@drawable/checkbox_right"
+                android:enabled="false" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+            <Button
+                android:id="@+id/buttonDownLeft"
+                android:layout_width="@dimen/direction_longest"
+                android:layout_height="@dimen/direction_longest"
+                android:background="@drawable/checkbox_downleft"
+                android:enabled="false" />
+
+            <Button
+                android:id="@+id/buttonDown"
+                android:layout_width="@dimen/direction_shortest"
+                android:layout_height="@dimen/direction_longest"
+                android:background="@drawable/checkbox_down"
+                android:enabled="false" />
+
+            <Button
+                android:id="@+id/buttonDownRight"
+                android:layout_width="@dimen/direction_longest"
+                android:layout_height="@dimen/direction_longest"
+                android:background="@drawable/checkbox_downright"
+                android:enabled="false" />
+
+        </LinearLayout>
+    </LinearLayout>
+    
+</RelativeLayout>
+
+
+
+
+
+            

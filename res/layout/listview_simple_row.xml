@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+    <TextView
+        android:id="@+id/txt1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/listview_text_margin"
+        android:layout_marginTop="@dimen/listview_text_margin"
+        android:textSize="@dimen/listview_text_size"
+        android:gravity="center"
+        android:text="TextView" />
+</LinearLayout>

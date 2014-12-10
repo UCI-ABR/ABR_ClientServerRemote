@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#fffbd5" >
+
+	<LinearLayout
+	    android:layout_width="match_parent"
+	    android:layout_height="match_parent"
+	    android:layout_centerHorizontal="true"
+	    android:layout_centerVertical="true"
+	    android:layout_margin="30dp"
+	    android:focusable="true"
+	    android:focusableInTouchMode="true"
+	    android:gravity="center"
+	    android:orientation="vertical" >
+
+	    <requestFocus />
+		<LinearLayout
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		   	android:layout_margin="10dp"
+	   		android:orientation="horizontal" >
+
+			<LinearLayout
+			    android:layout_width="wrap_content"
+			    android:layout_height="wrap_content"
+			    android:layout_gravity="center_vertical"
+			    android:layout_marginRight="@dimen/layout_margin_right"
+			    android:gravity="center"
+			    android:orientation="vertical" >
+
+			    <TextView
+			        android:layout_width="wrap_content"
+			        android:layout_height="wrap_content"
+		   	 		android:layout_marginBottom="10dp"
+			        android:text="Image Resolution"
+			        android:textColor="#ca2559"
+			        android:textSize="@dimen/connection_text_size" />
+			    <!--  
+			    <Spinner
+			        android:id="@+id/spinnerSize"
+			        android:layout_width="wrap_content"
+			        android:layout_height="wrap_content"
+			        android:layout_marginBottom="10dp"
+			        android:background="@drawable/spinner_background" />
+ 				-->
+
+			    <Button
+			        android:id="@+id/buttonSize"
+			        android:layout_width="@dimen/camera_size_button_width"
+			        android:layout_height="@dimen/camera_size_button_height"
+			        android:background="@drawable/spinner_background"
+			        android:text="Button"
+			        android:textColor="#FFFFFF"
+			        android:textSize="@dimen/connection_text_size" />
+
+			</LinearLayout>
+			<LinearLayout
+			    android:id="@+id/layout"
+			    android:layout_width="wrap_content"
+			    android:layout_height="wrap_content"
+			    android:gravity="center"
+			    android:orientation="vertical" >
+			    <TextView
+			        android:id="@+id/txtQuality"
+			        android:layout_width="wrap_content"
+			        android:layout_height="wrap_content"
+			        android:text="Image Quality 100%"
+			        android:textColor="#ca2559"
+			        android:textSize="@dimen/connection_text_size" />
+
+			    <SeekBar
+			        android:id="@+id/barQuality"
+			        android:layout_width="@dimen/seekbar_width"
+			        android:layout_height="@dimen/seekbar_height"
+			        android:layout_marginTop="10dp"
+			        android:max="100"
+			        android:progress="30"
+			        android:progressDrawable="@drawable/seekbar_progress"
+			        android:thumb="@null" />
+		
+			    <TextView
+			        android:id="@+id/textView1"
+			        android:layout_width="wrap_content"
+			        android:layout_height="wrap_content"
+			        android:layout_marginTop="@dimen/edit_text_margin_top"
+			        android:text="Password"
+			        android:textColor="#ca2559"
+			        android:textSize="@dimen/connection_text_size" />
+
+			    <EditText
+			        android:id="@+id/etxtPass"
+			        android:layout_width="@dimen/edit_text_width"
+			        android:layout_height="@dimen/edit_text_height"
+			        android:background="@drawable/control_edittext"
+			        android:gravity="center_horizontal"
+			        android:maxLength="10"
+			        android:textColor="#fe3e7a"
+			        android:textSize="@dimen/connection_text_size"
+	            	android:singleLine="true"  />	    
+			</LinearLayout>
+		</LinearLayout>
+
+		<Button
+		    android:id="@+id/buttonOK"
+		    android:layout_width="@dimen/login_button_size"
+		    android:layout_height="@dimen/login_button_size"
+		    android:background="@drawable/button_start" />
+
+	</LinearLayout>
+
+	<ImageView
+	    android:id="@+id/imageView1"
+	    android:layout_width="@dimen/image_mode_size"
+	    android:layout_height="@dimen/image_mode_size"
+	    android:layout_alignParentLeft="true"
+	    android:layout_alignParentTop="true"
+	    android:src="@drawable/dialog_header_ioio" />
+
+</RelativeLayout>

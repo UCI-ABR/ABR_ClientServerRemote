@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="#ffffff"
+    android:gravity="center"
+    android:orientation="vertical" >
+    <LinearLayout 
+        android:layout_width="fill_parent"
+    	android:layout_height="fill_parent"
+	    android:id="@+id/layout" 
+	    android:background="#fffbd5"
+    	android:orientation="horizontal">
+    </LinearLayout>
+    <LinearLayout 
+        android:layout_width="fill_parent"
+    	android:layout_height="fill_parent"
+	    android:orientation="vertical" 
+	    android:gravity="center">
+        <ImageView
+            android:id="@+id/imageSplash"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:adjustViewBounds="true"
+            android:src="@drawable/inex_logo" />
+    </LinearLayout>
+</RelativeLayout>

@@ -113,7 +113,8 @@ public class IOIOService extends AsyncTask<Void, Void, Void> {
 								}
 								else if(array[0].equals("SPEECH"))
 								{
-									mHandler.obtainMessage(MESSAGE_SPEECH,  array[1]).sendToTarget();
+									String textspeech = array[1] + "/"+ array[2];
+									mHandler.obtainMessage(MESSAGE_SPEECH, textspeech).sendToTarget();
 								}
 							}
 						} catch (SocketException e) {

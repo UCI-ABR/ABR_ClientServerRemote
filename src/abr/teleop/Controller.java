@@ -27,16 +27,20 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.Toast;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 
-public class Controller extends Activity{
+public class Controller extends Activity implements OnItemSelectedListener{
 	private final static String TAG = "CameraRobot-Controller";
 	
     public static final int MESSAGE_DATA_RECEIVE = 0;
@@ -47,6 +51,9 @@ public class Controller extends Activity{
     
 	EditText speechText; 
 	Button btnSpeech;
+	Spinner spinner_language;
+	ArrayAdapter<CharSequence> adapter;
+	String text_language;
     
     RelativeLayout layout_joystick, layout_joystick_PT;
 	JoyStickClass js, js_PT;
@@ -82,6 +89,17 @@ public class Controller extends Activity{
 		imageView1 = (ImageView)findViewById(R.id.imageView1);
 		
 		speechText  = (EditText)findViewById(R.id.editText_speech);		
+		spinner_language = (Spinner)findViewById(R.id.spinner_language);
+		
+		// Create an ArrayAdapter using the string array and a default spinner layout
+		adapter = ArrayAdapter.createFromResource(this, R.array.languages_array, android.R.layout.simple_spinner_item);
+		// Specify the layout to use when the list of choices appears
+		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		// Apply the adapter to the spinner
+		spinner_language.setAdapter(adapter);
+		//add listner
+		spinner_language.setOnItemSelectedListener(this);
+
 		
 		layout_joystick = (RelativeLayout)findViewById(R.id.layout_joystick);
 	    js = new JoyStickClass(getApplicationContext()
@@ -163,15 +181,18 @@ public class Controller extends Activity{
 //				Log.e("controller", "pwm_pan: " + pwm_pan + " pwm_tilt: " + pwm_tilt);
 				
 				send("PT/" + pwm_pan + "/" + pwm_tilt);				
-			}
+			}			
         });
+	    
+	    
+
 	    
 	    //******************************************************************************************************************/
 	    
 	    btnSpeech 	= (Button)findViewById(R.id.btn_speech);
 	    btnSpeech.setOnClickListener(new OnClickListener() {
 	    	public void onClick(View v) {	    		
-	    		String text = "SPEECH/" + speechText.getText().toString();
+	    		String text = "SPEECH/" + text_language + "/" + speechText.getText().toString();
 	    		Log.e("controller", "sending speech" + text);
 	    		send(text);
 	    	}
@@ -287,6 +308,13 @@ public class Controller extends Activity{
 		new Thread(readThread).start();
 	}
 	
+	
+    public void onItemSelected(AdapterView<?> parent, View v, int position, long id) 
+    {    	
+    	text_language = adapter.getItem(position).toString(); 
+    	Log.e("language selected",text_language);
+    }
+	
 	public void onPause() {
 		super.onPause();
 
@@ -337,5 +365,13 @@ public class Controller extends Activity{
 			}
 		}).start();
 		
+	}
+
+
+	@Override
+	public void onNothingSelected(AdapterView<?> parent) {
+		// TODO Auto-generated method stub
+    	text_language = adapter.getItem(0).toString(); 
+    	Log.e("language default",text_language);
 	}
 }

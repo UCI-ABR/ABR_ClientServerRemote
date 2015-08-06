@@ -21,10 +21,20 @@
 
         <EditText
             android:id="@+id/editText_speech"
-            android:layout_width="wrap_content"
+            android:layout_width="153dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:ems="10" />
+            android:ems="10" >
+
+            <requestFocus />
+        </EditText>
+
+        <Spinner
+            android:id="@+id/spinner_language"
+            android:layout_width="200dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1.00" 
+            android:entries="@array/languages_array"
+        	android:prompt="@string/country_prompt" />
 
         <Button
             android:id="@+id/btn_speech"
@@ -54,7 +64,6 @@
             android:layout_margin="@dimen/command_button_margin"
             android:background="@drawable/checkbox_flash"
             android:button="@null" />
-
     </LinearLayout>
 
     <RelativeLayout

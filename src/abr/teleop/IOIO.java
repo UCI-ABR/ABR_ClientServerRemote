@@ -269,7 +269,16 @@ public class IOIO extends IOIOActivity implements Callback, PreviewCallback, Pic
 			{
 				String ss = ((String)msg.obj);
 				Log.i("IOIO", "MESSAGE speech: " + ss);
-				t1.speak(ss, TextToSpeech.QUEUE_FLUSH, null);
+				
+				String[] array = ss.split("/");
+				Log.e("IOIO", "received: " + ss);
+				
+				if(array[0].equals("English (US)"))			t1.setLanguage(Locale.US);
+				else if(array[0].equals("English (UK)"))	t1.setLanguage(Locale.UK);
+				else if(array[0].equals("French"))			t1.setLanguage(Locale.FRENCH);
+				else if(array[0].equals("German"))			t1.setLanguage(Locale.GERMAN);				
+				
+				t1.speak(array[1], TextToSpeech.QUEUE_FLUSH, null);
 			} 			
 
 		}

@@ -30,6 +30,7 @@ import android.view.View.OnTouchListener;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
@@ -43,6 +44,9 @@ public class Controller extends Activity{
     Button buttonUp, buttonDown, buttonLeft, buttonRight;
     ImageView imageView1;
     CheckBox cbFlash;
+    
+	EditText speechText; 
+	Button btnSpeech;
     
     RelativeLayout layout_joystick, layout_joystick_PT;
 	JoyStickClass js, js_PT;
@@ -76,6 +80,8 @@ public class Controller extends Activity{
 		pass = getIntent().getExtras().getString("Pass");
 		
 		imageView1 = (ImageView)findViewById(R.id.imageView1);
+		
+		speechText  = (EditText)findViewById(R.id.editText_speech);		
 		
 		layout_joystick = (RelativeLayout)findViewById(R.id.layout_joystick);
 	    js = new JoyStickClass(getApplicationContext()
@@ -162,7 +168,14 @@ public class Controller extends Activity{
 	    
 	    //******************************************************************************************************************/
 	    
-	    
+	    btnSpeech 	= (Button)findViewById(R.id.btn_speech);
+	    btnSpeech.setOnClickListener(new OnClickListener() {
+	    	public void onClick(View v) {	    		
+	    		String text = "SPEECH/" + speechText.getText().toString();
+	    		Log.e("controller", "sending speech" + text);
+	    		send(text);
+	    	}
+	    });
 	    
 	    Button buttonSnap = (Button)findViewById(R.id.btnPhotoSnap);
 	    buttonSnap.setOnClickListener(new OnClickListener() {

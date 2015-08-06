@@ -20,6 +20,7 @@ import java.net.Socket;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import android.content.Context;
 import android.content.pm.ActivityInfo;
@@ -36,6 +37,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceHolder.Callback;
@@ -80,6 +82,8 @@ public class IOIO extends IOIOActivity implements Callback, PreviewCallback, Pic
 	int pwm_pan, pwm_tilt;
 	int pwm_speed, pwm_steering;
 	
+	TextToSpeech t1;
+	
 	Camera mCamera;
 	Camera.Parameters params;
     SurfaceView mPreview;
@@ -104,6 +108,22 @@ public class IOIO extends IOIOActivity implements Callback, PreviewCallback, Pic
 	
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+        t1=new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+            	Log.e("TextToSpeech onInit", "onInit");
+               if(status != TextToSpeech.ERROR) {
+                  t1.setLanguage(Locale.US);
+                  Log.e("TextToSpeech", "onInit: language set");
+                  Toast.makeText(getApplicationContext()
+  						, "Text to speech ready"
+  						, Toast.LENGTH_SHORT).show();
+               }
+            }
+         });
+        
+        
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN 
         		| WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -122,6 +142,8 @@ public class IOIO extends IOIOActivity implements Callback, PreviewCallback, Pic
         buttonDownRight = (Button)findViewById(R.id.buttonDownRight);
         buttonRight = (Button)findViewById(R.id.buttonRight);
         buttonLeft = (Button)findViewById(R.id.buttonLeft);
+        
+
 
         txtspeed_motor = (TextView)findViewById(R.id.txtSpeed);
         
@@ -243,11 +265,22 @@ public class IOIO extends IOIOActivity implements Callback, PreviewCallback, Pic
 				pwm_pan = 1500;
 				pwm_tilt = 1500;
 			} 
+			else if(command == IOIOService.MESSAGE_SPEECH) 
+			{
+				String ss = ((String)msg.obj);
+				Log.i("IOIO", "MESSAGE speech: " + ss);
+				t1.speak(ss, TextToSpeech.QUEUE_FLUSH, null);
+			} 			
+
 		}
 	};
 	
 	public void onPause() {
         super.onPause();
+        if(t1 !=null){
+            t1.stop();
+            t1.shutdown();
+         }
 		ioio.killTask();
 		finish();
     }

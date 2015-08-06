@@ -39,8 +39,10 @@ public class IOIOService extends AsyncTask<Void, Void, Void> {
 	public static final int MESSAGE_MOVE = 11;
 
 	public static final int MESSAGE_PT_STOP = 19;
-	public static final int MESSAGE_PT_MOVE = 20;	
-
+	public static final int MESSAGE_PT_MOVE = 20;
+	
+	public static final int MESSAGE_SPEECH = 21;
+	
 	Boolean TASK_STATE = true;
 	ServerSocket ss;
 	ImageView mImageView;
@@ -69,7 +71,7 @@ public class IOIOService extends AsyncTask<Void, Void, Void> {
 			public void run() {
 
 				try {
-					byte[] message = new byte[12];
+					byte[] message = new byte[128];
 					DatagramPacket p = new DatagramPacket(message, message.length);
 					DatagramSocket s = new DatagramSocket(null);
 					s.setReuseAddress(true);
@@ -101,12 +103,17 @@ public class IOIOService extends AsyncTask<Void, Void, Void> {
 							} else
 							{
 								String[] array = text.split("/");
+								Log.e(TAG, "received: " + text);
 								if(array[0].equals("PT"))
 								{
 									int pan = Integer.parseInt(array[1]);
 									int tilt = Integer.parseInt(array[2]);
 
 									mHandler.obtainMessage(MESSAGE_PT_MOVE, pan, tilt).sendToTarget();									
+								}
+								else if(array[0].equals("SPEECH"))
+								{
+									mHandler.obtainMessage(MESSAGE_SPEECH,  array[1]).sendToTarget();
 								}
 							}
 						} catch (SocketException e) {

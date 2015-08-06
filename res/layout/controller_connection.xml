@@ -54,7 +54,7 @@
 	            android:singleLine="true" />
 	
 	        <TextView
-	            android:id="@+id/textView1"
+	            android:id="@+id/textView2"
 	            android:layout_width="wrap_content"
 	            android:layout_height="wrap_content"
 	            android:layout_marginTop="@dimen/edit_text_margin_top"

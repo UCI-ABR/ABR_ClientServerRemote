@@ -39,7 +39,9 @@ public class IOIOService extends AsyncTask<Void, Void, Void> {
 	public static final int MESSAGE_MOVE = 11;
 
 	public static final int MESSAGE_PT_STOP = 19;
-	public static final int MESSAGE_PT_MOVE = 20;	
+	public static final int MESSAGE_PT_MOVE = 20;
+
+	public static final int MESSAGE_LOG = 21;
 
 	Boolean TASK_STATE = true;
 	ServerSocket ss;
@@ -171,6 +173,8 @@ public class IOIOService extends AsyncTask<Void, Void, Void> {
 					mHandler.obtainMessage(MESSAGE_SNAP).sendToTarget();
 				} else if(data.equals("LEDON") || data.equals("LEDOFF")) {
 					mHandler.obtainMessage(MESSAGE_FLASH, data).sendToTarget();
+				} else if(data.equals("LOGON") || data.equals("LOGOFF")) {
+					mHandler.obtainMessage(MESSAGE_LOG, data).sendToTarget();
 				} else if(data.equals("Focus")) {
 					mHandler.obtainMessage(MESSAGE_FOCUS).sendToTarget();
 				} 

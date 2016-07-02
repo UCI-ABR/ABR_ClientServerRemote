@@ -1,0 +1,41 @@
+apply plugin: 'com.android.application'
+
+buildscript {
+  repositories {
+    mavenCentral()
+  }
+
+  dependencies {
+    classpath 'com.android.tools.build:gradle:2.1.0'
+  }
+}
+
+android {
+  buildToolsVersion "22.0.1"
+  compileSdkVersion 23
+  defaultConfig {
+    applicationId "abr.main.template"
+  }
+  defaultConfig {
+    applicationId "abr.teleop.clientserverremote"
+    minSdkVersion 21
+    targetSdkVersion 21
+  }
+}
+
+dependencies {
+  compile 'com.github.ytai.ioio:IOIOLibAndroid:5.05'
+  compile 'com.github.ytai.ioio:IOIOLibAndroidBluetooth:5.05'
+  compile 'com.github.ytai.ioio:IOIOLibAndroidAccessory:5.05'
+  compile 'com.github.ytai.ioio:IOIOLibAndroidDevice:5.05'
+  compile 'org.opencv:OpenCV-Android:3.1.0'
+  compile 'com.google.android.gms:play-services:9.0.2'
+}
+
+repositories {
+  mavenCentral()
+  maven {
+    url  "http://dl.bintray.com/steveliles/maven"
+  }
+}
+

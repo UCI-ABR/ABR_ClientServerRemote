@@ -43,6 +43,7 @@ public class Controller extends Activity{
     Button buttonUp, buttonDown, buttonLeft, buttonRight;
     ImageView imageView1;
     CheckBox cbFlash;
+	CheckBox cbLog;
     
     RelativeLayout layout_joystick, layout_joystick_PT;
 	JoyStickClass js, js_PT;
@@ -57,6 +58,9 @@ public class Controller extends Activity{
 	
 	Socket s;
 	String ip, pass;
+
+	int pwm_speed = 1500;
+	int pwm_steering = 1500;
     
 	protected void onCreate(Bundle savedInstanceState) {
 		
@@ -77,48 +81,52 @@ public class Controller extends Activity{
 		
 		imageView1 = (ImageView)findViewById(R.id.imageView1);
 		
-		layout_joystick = (RelativeLayout)findViewById(R.id.layout_joystick);
-	    js = new JoyStickClass(getApplicationContext()
-        		, layout_joystick, R.drawable.image_button);
-	    js.setStickSize(screenHeight / 7, screenHeight / 7);
-	    js.setLayoutSize(screenHeight / 2, screenHeight / 2);
-	    js.setLayoutAlpha(50);
-	    js.setStickAlpha(255);
-	    js.setOffset((int)((screenHeight / 9) * 0.6));
+//		layout_joystick = (RelativeLayout)findViewById(R.id.layout_joystick);
+//	    js = new JoyStickClass(getApplicationContext()
+//        		, layout_joystick, R.drawable.image_button);
+//	    js.setStickSize(screenHeight / 7, screenHeight / 7);
+//	    js.setLayoutSize(screenHeight / 2, screenHeight / 2);
+//	    js.setLayoutAlpha(50);
+//	    js.setStickAlpha(255);
+//	    js.setOffset((int)((screenHeight / 9) * 0.6));
 //	    js.setMinimumDistance((int)((screenHeight / 9) * 0.6));
 	    
-	    layout_joystick.setOnTouchListener(new OnTouchListener() {
-	    	long time = System.currentTimeMillis();
-			public boolean onTouch(View arg0, MotionEvent arg1) {
-				js.drawStick(arg1);
-				if(arg1.getAction() == MotionEvent.ACTION_DOWN) {
-					command();
-				} else if(arg1.getAction() == MotionEvent.ACTION_MOVE) {
-					if(System.currentTimeMillis() - time > 200) {
-						command();
-						time = System.currentTimeMillis(); 
-					}
-				} else if(arg1.getAction() == MotionEvent.ACTION_UP) {
-					send("SS");
-					send("SS");
-				}
-				return true;
-			}
-			
-			public void command() 
-			{	
-				int pwm_steering=1500;
-				int pwm_speed = 1500 - (int)(250*js.getnormY());		//reverse Y			
-				
-				if(pwm_speed < 1500)
-					pwm_steering = 1500 + (int)(500*js.getnormX());    //reverse X
-				else
-					pwm_steering = 1500 - (int)(500*js.getnormX());    //reverse X
-				
-				send("MC/" + pwm_speed + "/" + pwm_steering);
-			}
-        });
-	    
+//	    layout_joystick.setOnTouchListener(new OnTouchListener() {
+//	    	long time = System.currentTimeMillis();
+//			public boolean onTouch(View arg0, MotionEvent arg1) {
+//				/*
+//				js.drawStick(arg1);
+//				if(arg1.getAction() == MotionEvent.ACTION_DOWN) {
+//					command();
+//				} else if(arg1.getAction() == MotionEvent.ACTION_MOVE) {
+//					if(System.currentTimeMillis() - time > 200) {
+//						command();
+//						time = System.currentTimeMillis();
+//					}
+//				} else if(arg1.getAction() == MotionEvent.ACTION_UP) {
+//					//send("SS");
+//					//send("SS");
+//					pwm_speed = 1500;
+//					send("MC/" + pwm_speed + "/" + pwm_steering);
+//				}
+//				*/
+//				return true;
+//			}
+//
+//			public void command()
+//			{
+//				pwm_speed = 1500 - (int)(250*js.getnormY());		//reverse Y
+//
+//				/*
+//				if(pwm_speed < 1500)
+//					pwm_steering = 1500 + (int)(500*js.getnormX());    //reverse X
+//				else
+//					pwm_steering = 1500 - (int)(500*js.getnormX());    //reverse X
+//				*/
+//				send("MC/" + pwm_speed + "/" + pwm_steering);
+//			}
+//        });
+//
 	    
 	    //***********************************  added joystick for pan and tilt unit control   *************************************/
 	    layout_joystick_PT = (RelativeLayout)findViewById(R.id.layout_joystick2);
@@ -143,20 +151,25 @@ public class Controller extends Activity{
 //						time = System.currentTimeMillis(); 
 //					}
 				} else if(arg1.getAction() == MotionEvent.ACTION_UP) {
-					send("PT_SS");
-					send("PT_SS");
+					//send("PT_SS");
+					//send("PT_SS");
+					pwm_steering = 1500;
+					send("MC/" + pwm_speed + "/" + pwm_steering);
 				}
 				return true;
 			}
 			
 			public void command() 
 			{				
-				int pwm_pan = 1500 + (int)(500*js_PT.getnormX());
-				int pwm_tilt = 1500 + (int)(500*js_PT.getnormY());
-				
+				//int pwm_pan = 1500 + (int)(500*js_PT.getnormX());
+				//int pwm_tilt = 1500 + (int)(500*js_PT.getnormY());
+
+				pwm_steering = 1500 + (int)(200*js_PT.getnormX());
+
 //				Log.e("controller", "pwm_pan: " + pwm_pan + " pwm_tilt: " + pwm_tilt);
 				
-				send("PT/" + pwm_pan + "/" + pwm_tilt);				
+				//send("PT/" + pwm_pan + "/" + pwm_tilt);
+				send("MC/" + pwm_speed + "/" + pwm_steering);
 			}
         });
 	    
@@ -188,6 +201,29 @@ public class Controller extends Activity{
 				}
 			}
         });
+
+		cbLog = (CheckBox)findViewById(R.id.cbLog);
+		cbLog.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+			public void onCheckedChanged(CompoundButton arg0, boolean arg1) {
+				if(arg1) {
+					sendString("LOGON");
+					Toast.makeText(getApplicationContext()
+							, "Logging on"
+							, Toast.LENGTH_SHORT).show();
+					cbLog.setBackgroundResource(R.drawable.log_pressed);
+					pwm_speed = 1550;
+					send("MC/" + pwm_speed + "/" + pwm_steering);
+				} else {
+					sendString("LOGOFF");
+					Toast.makeText(getApplicationContext()
+							, "Logging off"
+							, Toast.LENGTH_SHORT).show();
+					cbLog.setBackgroundResource(R.drawable.log_normal);
+					pwm_speed = 1500;
+					send("MC/" + pwm_speed + "/" + pwm_steering);
+				}
+			}
+		});
 		
 		Runnable readThread = new Runnable() {
 			Bitmap bitmap;

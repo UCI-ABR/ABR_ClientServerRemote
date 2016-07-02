@@ -1,6 +1,5 @@
 package abr.teleop;
 
-import ioio.lib.api.DigitalOutput;
 import ioio.lib.api.PwmOutput;
 import ioio.lib.api.exception.ConnectionLostException;
 import ioio.lib.util.BaseIOIOLooper;
@@ -18,6 +17,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.Socket;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -30,6 +30,13 @@ import android.hardware.Camera;
 import android.hardware.Camera.Parameters;
 import android.hardware.Camera.PictureCallback;
 import android.hardware.Camera.PreviewCallback;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
+import android.location.Location;
+import android.media.AudioManager;
+import android.media.ToneGenerator;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
@@ -52,7 +59,13 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class IOIO extends IOIOActivity implements Callback, PreviewCallback, PictureCallback{
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
+
+public class IOIO extends IOIOActivity implements Callback, SensorEventListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, PreviewCallback, PictureCallback{
 	private static final String TAG_IOIO = "CameraRobot-IOIO";
 	private static final String TAG_CAMERA = "CameraRobot-Camera";
 	
@@ -101,7 +114,31 @@ public class IOIO extends IOIOActivity implements Callback, PreviewCallback, Pic
     int w, h;
     int[] rgbs;
     boolean initialed = false;
-	
+
+	//variables for logging
+	float[] mGrav;
+	float[] mAcc;
+	float[] mGyro;
+	float[] mGeo;
+	File rrFile;
+	File jpgFile;
+	File recordingFile;
+	FileOutputStream fosRR;
+	Boolean logging;
+
+	//location variables
+	private GoogleApiClient mGoogleApiClient;
+	private Location curr_loc;
+	private LocationRequest mLocationRequest;
+	private LocationListener mLocationListener;
+	Location dest_loc;
+
+	//variables for compass
+	private SensorManager mSensorManager;
+	private Sensor mCompass, mAccelerometer, mGeomagnetic, mGravity, mGyroscope;
+	public float heading = 0;
+	public float bearing;
+
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -144,6 +181,151 @@ public class IOIO extends IOIOActivity implements Callback, PreviewCallback, Pic
 		});
 		
     	om = new OrientationManager(this);
+
+		// phone must be Android 2.3 or higher and have Google Play store
+		// must have Google Play Services: https://developers.google.com/android/guides/setup
+		dest_loc = new Location("");
+		buildGoogleApiClient();
+		mLocationRequest = new LocationRequest();
+		mLocationRequest.setInterval(2000);
+		mLocationRequest.setFastestInterval(500);
+		mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+		//set up location listener
+		mLocationListener = new LocationListener() {
+			public void onLocationChanged(Location location) {
+				curr_loc = location;
+				bearing = location.bearingTo(dest_loc);
+			}
+			@SuppressWarnings("unused")
+			public void onStatusChanged(String provider, int status, Bundle extras) {
+			}
+			@SuppressWarnings("unused")
+			public void onProviderEnabled(String provider) {
+			}
+			@SuppressWarnings("unused")
+			public void onProviderDisabled(String provider) {
+			}
+		};
+
+		//set up compass
+		mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+		mCompass= mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+		mAccelerometer= mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+		mGyroscope = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
+		mGravity = mSensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY);
+
+		logging = false;
+	}
+
+	@Override
+	protected void onStart() {
+		super.onStart();
+		mGoogleApiClient.connect();
+	}
+
+	@Override
+	protected void onStop() {
+		super.onStop();
+		mGoogleApiClient.disconnect();
+	}
+	protected void onDestroy(){
+		super.onDestroy();
+		try {
+			fosRR.close();
+		} catch (IOException e) {
+			Log.e(TAG_IOIO, e.toString());
+		}
+	}
+
+	//Method necessary for google play location services
+	protected synchronized void buildGoogleApiClient() {
+		mGoogleApiClient = new GoogleApiClient.Builder(this)
+				.addConnectionCallbacks(this)
+				.addOnConnectionFailedListener(this)
+				.addApi(LocationServices.API)
+				.build();
+	}
+	//Method necessary for google play location services
+	@Override
+	public void onConnected(Bundle connectionHint) {
+		// Connected to Google Play services
+		curr_loc = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+		startLocationUpdates();
+	}
+	//Method necessary for google play location services
+	protected void startLocationUpdates() {
+		LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, mLocationListener);
+	}
+
+	protected void stopLocationUpdates() {
+		LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, mLocationListener);
+	}
+	//Method necessary for google play location services
+	@Override
+	public void onConnectionSuspended(int cause) {
+		// The connection has been interrupted.
+		// Disable any UI components that depend on Google APIs
+		// until onConnected() is called.
+	}
+	//Method necessary for google play location services
+	@Override
+	public void onConnectionFailed(ConnectionResult result) {
+		// This callback is important for handling errors that
+		// may occur while attempting to connect with Google.
+		//
+		// More about this in the 'Handle Connection Failures' section.
+	}
+
+	@Override
+	public final void onAccuracyChanged(Sensor sensor, int accuracy) {
+		// Do something here if sensor accuracy changes.
+	}
+	//Called whenever the value of a sensor changes
+	@Override
+	public final void onSensorChanged(SensorEvent event) {
+		if (event.sensor.getType() == Sensor.TYPE_GRAVITY)
+			mGrav = event.values;
+		if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE)
+			mGyro = event.values;
+		if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER)
+			mAcc = event.values;
+		if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD)
+			mGeo = event.values;
+		if (mAcc != null && mGeo != null) {
+			Log.i(TAG_IOIO,"mAcc mGeo not null");
+			float[] temp = new float[9];
+			float[] R = new float[9];
+			//Load rotation matrix into R
+			SensorManager.getRotationMatrix(temp, null, mAcc, mGeo);
+			//Remap to camera's point-of-view
+			SensorManager.remapCoordinateSystem(temp, SensorManager.AXIS_X, SensorManager.AXIS_Z, R);
+			//Return the orientation values
+			float[] values = new float[3];
+			SensorManager.getOrientation(R, values);
+			//Convert to degrees
+			for (int i=0; i < values.length; i++) {
+				Double degrees = (values[i] * 180) / Math.PI;
+				values[i] = degrees.floatValue();
+			}
+			//Update the compass direction
+			heading = values[0]+12;
+			heading = (heading*5 + fixWraparound(values[0]+12))/6; //add 12 to make up for declination in Irvine, average out from previous 2 for smoothness
+			Log.i(TAG_IOIO,"heading:"+heading);
+		}
+	}
+
+	//Called whenever activity resumes from pause
+	@Override
+	public void onResume() {
+		super.onResume();
+		mSensorManager.registerListener(this, mCompass, SensorManager.SENSOR_DELAY_NORMAL);
+		mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+		mSensorManager.registerListener(this, mGyroscope, SensorManager.SENSOR_DELAY_NORMAL);
+		mSensorManager.registerListener(this, mGravity, SensorManager.SENSOR_DELAY_NORMAL);
+		if (mGoogleApiClient.isConnected()) {
+			startLocationUpdates();
+		}
 	}
 	
 	Handler mHandler = new Handler() {
@@ -211,6 +393,63 @@ public class IOIO extends IOIOActivity implements Callback, PreviewCallback, Pic
 					sendString("NoFlash");
 				}
 			    mCamera.setParameters(params);
+			} else if(command == IOIOService.MESSAGE_LOG) {
+				if(logging) {
+					logging = false;
+					Toast.makeText(getApplicationContext()
+							, "Logging off"
+							, Toast.LENGTH_SHORT).show();
+					try {
+						fosRR.close();
+					} catch (IOException e) {
+						Log.e(TAG_IOIO, e.toString());
+					}
+				}
+				else {
+					logging = true;
+					Toast.makeText(getApplicationContext()
+							, "Logging on"
+							, Toast.LENGTH_SHORT).show();
+					//open file and stream for writing data
+					try {
+						Calendar calendar = Calendar.getInstance();
+						java.util.Date now = calendar.getTime();
+						java.sql.Timestamp currentTimestamp = new java.sql.Timestamp(now.getTime());
+						String time = currentTimestamp.toString();
+						time = time.replaceAll("[|?*<\":>+\\[\\]/']", "_");
+
+						File[] externalDirs = getExternalFilesDirs(null);
+						if(externalDirs.length > 1) {
+							jpgFile = new File(externalDirs[1].getAbsolutePath() + "/rescuerobotics/"+time+"/pics");
+							if (!jpgFile.exists()) {
+								jpgFile.mkdirs();
+							}
+							rrFile = new File(externalDirs[1].getAbsolutePath() + "/rescuerobotics/"+time);
+							if (!rrFile.exists()) {
+								rrFile.mkdirs();
+							}
+						} else {
+							jpgFile = new File(externalDirs[0].getAbsolutePath() + "/rescuerobotics/"+time+"/pics");
+							if (!jpgFile.exists()) {
+								jpgFile.mkdirs();
+							}
+							rrFile = new File(externalDirs[0].getAbsolutePath() + "/rescuerobotics/"+time);
+							if (!rrFile.exists()) {
+								rrFile.mkdirs();
+							}
+						}
+						recordingFile = new File(rrFile, time+".csv");
+
+						recordingFile.createNewFile();
+
+						fosRR = new FileOutputStream(recordingFile);
+						String labels = "Time,Lat,Lon,AccX,AccY,AccZ,GyroX,GyroY,GyroZ,GeoX,GeoY,GeoZ,GravX,GravY,GravZ,Heading,PwmSpeed,PwmSteer\n";
+						byte[] b = labels.getBytes();
+						fosRR.write(b);
+					} catch (IOException e) {
+						Log.e(TAG_IOIO, e.toString());
+					}
+				}
 			} else if(command == IOIOService.MESSAGE_SNAP) {
 		    	if((int)(System.currentTimeMillis() / 1000) - startTime > 1) {
 			    	Log.d(TAG_CAMERA,"Snap");
@@ -248,8 +487,11 @@ public class IOIO extends IOIOActivity implements Callback, PreviewCallback, Pic
 	
 	public void onPause() {
         super.onPause();
+		mSensorManager.unregisterListener(this);
+		stopLocationUpdates();
 		ioio.killTask();
 		finish();
+
     }
     
     public void clearCheckBox() {
@@ -389,19 +631,19 @@ public class IOIO extends IOIOActivity implements Callback, PreviewCallback, Pic
 	}
 	
 	public void onPreviewFrame(final byte[] arg0, Camera arg1) {
-		if(!initialed) {
+		if (!initialed) {
 			w = mCamera.getParameters().getPreviewSize().width;
 			h = mCamera.getParameters().getPreviewSize().height;
 			rgbs = new int[w * h];
 			initialed = true;
 		}
 
-		if(arg0 != null && connect_state) {
+		if (arg0 != null && connect_state) {
 			try {
 				decodeYUV420(rgbs, arg0, w, h);
 				bitmap = Bitmap.createBitmap(rgbs, w, h, Config.ARGB_8888);
 				bos = new ByteArrayOutputStream();
-				bitmap.compress(CompressFormat.JPEG, quality, bos);
+				bitmap.compress(CompressFormat.JPEG, 75, bos);
 				sendImage(bos.toByteArray());
 			} catch (OutOfMemoryError e) {
 				Toast.makeText(getApplicationContext()
@@ -409,6 +651,34 @@ public class IOIO extends IOIOActivity implements Callback, PreviewCallback, Pic
 						, Toast.LENGTH_SHORT).show();
 				e.printStackTrace();
 				finish();
+			}
+		}
+
+		if(logging) {
+			String mill_timestamp = System.currentTimeMillis()+"";
+			String info = mill_timestamp + "," + curr_loc.getLatitude() + "," + curr_loc.getLongitude() + ","
+					+ mAcc[0] + "," + mAcc[1] + "," + mAcc[2] + ","
+					+ mGyro[0] + "," + mGyro[1] + "," + mGyro[2] + ","
+					+ mGeo[0] + "," + mGeo[1] + "," + mGeo[2] + ","
+					+ mGrav[0] + "," + mGrav[1] + "," + mGrav[2] + ","
+					+ heading + "," + pwm_speed + "," + pwm_steering + "\n";
+			try {
+				byte[] b = info.getBytes();
+				fosRR.write(b);
+			} catch (IOException e) {
+				Log.e(TAG_IOIO, e.toString());
+			}
+
+			//open file and stream for saving frames as jpgs
+			try {
+				File file = new File(jpgFile, mill_timestamp + ".jpg");
+				file.createNewFile();
+				FileOutputStream fos = new FileOutputStream(file);
+				byte[] b = info.getBytes();
+				fos.write(bos.toByteArray());
+				fos.close();
+			} catch (Exception e) {
+				Log.e("app.main", "Couldn't write to SD");
 			}
 		}
 	}
@@ -518,7 +788,18 @@ public class IOIO extends IOIOActivity implements Callback, PreviewCallback, Pic
     	}
     	return fps;
     }
-	
+
+	//revert any degree measurement back to the -179 to 180 degree scale
+	public float fixWraparound(float deg){
+		if(deg <= 180.0 && deg > -179.99)
+			return deg;
+		else if(deg > 180)
+			return deg-360;
+		else
+			return deg+360;
+
+	}
+
 	class Looper extends BaseIOIOLooper 
 	{
 		PwmOutput speed, steering, pan, tilt;
@@ -530,7 +811,7 @@ public class IOIO extends IOIOActivity implements Callback, PreviewCallback, Pic
         	pwm_speed = DEFAULT_PWM;
         	pwm_steering = DEFAULT_PWM;
         	pwm_pan = DEFAULT_PWM;
-        	pwm_tilt = DEFAULT_PWM;        	
+        	pwm_tilt = 1800;
 
         	speed = ioio_.openPwmOutput(3, 50);        	
         	steering = ioio_.openPwmOutput(4, 50);        	

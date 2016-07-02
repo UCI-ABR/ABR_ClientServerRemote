@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000"
+    android:orientation="vertical" >
+
+    <ImageView
+        android:id="@+id/imageView1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <LinearLayout
+        android:id="@+id/linearLayout1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_margin="@dimen/command_button_layout_margin"
+        android:orientation="horizontal" >
+
+        <CheckBox
+            android:id="@+id/cbLog"
+            android:layout_width="@dimen/command_button_size"
+            android:layout_height="@dimen/command_button_size"
+            android:layout_margin="@dimen/command_button_margin"
+            android:background="@drawable/log_normal"
+            android:button="@null" />
+
+        <Button
+            android:id="@+id/btnAutoFocus"
+            android:layout_width="@dimen/command_button_size"
+            android:layout_height="@dimen/command_button_size"
+            android:layout_margin="@dimen/command_button_margin"
+            android:background="@drawable/button_focus" />
+
+        <Button
+            android:id="@+id/btnPhotoSnap"
+            android:layout_width="@dimen/command_button_size"
+            android:layout_height="@dimen/command_button_size"
+            android:layout_margin="@dimen/command_button_margin"
+            android:background="@drawable/button_snap" />
+
+        <CheckBox
+            android:id="@+id/cbFlash"
+            android:layout_width="@dimen/command_button_size"
+            android:layout_height="@dimen/command_button_size"
+            android:layout_margin="@dimen/command_button_margin"
+            android:background="@drawable/checkbox_flash"
+            android:button="@null" />
+
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/layout_joystick"
+        android:layout_width="@dimen/controller_size"
+        android:layout_height="@dimen/controller_size"
+        android:layout_above="@+id/linearLayout1"
+        android:layout_alignParentLeft="true"
+        android:layout_margin="@dimen/controller_margin"
+        android:layout_marginBottom="15dp"
+        android:layout_marginLeft="30dp"
+        android:background="@drawable/image_button_bg" >
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/layout_joystick2"
+        android:layout_width="@dimen/controller_size"
+        android:layout_height="@dimen/controller_size"
+        android:layout_above="@+id/linearLayout1"
+        android:layout_alignRight="@+id/linearLayout1"
+        android:layout_margin="@dimen/controller_margin"
+        android:layout_marginBottom="38dp"
+        android:background="@drawable/image_button_bg" >
+    </RelativeLayout>
+
+</RelativeLayout>
